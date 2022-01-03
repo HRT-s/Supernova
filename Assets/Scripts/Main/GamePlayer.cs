@@ -94,7 +94,7 @@ public class GamePlayer : MonoBehaviourPunCallbacks{
 
     public void OnRmAction(){
         ButtonClicked();
-        board.OnRemove(hitObj);
+        board.OnRemove(hitObj,clickedPos);
     }
 
     public void OnBurstAction(){
