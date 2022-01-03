@@ -1,1 +1,1 @@
-# SupernovaGomoku
+# Supernova
