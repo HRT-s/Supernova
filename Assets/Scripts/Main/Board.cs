@@ -4,16 +4,17 @@ using UnityEngine;
 using Photon.Pun;
 
 public class Board : MonoBehaviourPunCallbacks{
-    [SerializeField] private GameObject redstar;
-    [SerializeField] private GameObject bluestar;
+    [SerializeField] private GameManager gameManager;
+    [SerializeField] private GameObject burst;
     private const int BOARD_SIZE = 10;
-    private const int NUM_WIN = 7;
-    private int[,] mass = new int[BOARD_SIZE,BOARD_SIZE];
+    private const int NUM_WIN = 5;
+    private Star[,] mass = new Star[BOARD_SIZE,BOARD_SIZE];
+    private GameObject burstObj;
 
     private void Start(){
         for(int i = 0;i < BOARD_SIZE;i++){
-            for(int j = 0;j < BOARD_SIZE;i++){
-                mass[i,j] = -1;
+            for(int j = 0;j < BOARD_SIZE;j++){
+                mass[i,j] = null;
             }
         }
     }
@@ -22,62 +23,95 @@ public class Board : MonoBehaviourPunCallbacks{
         int checkTurn = GameManager.Turn;
         int x = (int)clickPos.x;
         int y = (int)clickPos.y;
-        if(CheckLine(x,y,checkTurn)) return true;
-        if(CheckLine(y,x,checkTurn)) return true;
+        if(CheckHorizontal(x,y,checkTurn)) return true;
+        if(CheckVertical(x,y,checkTurn)) return true;
         if(CheckRightDiagonal(x,y,checkTurn)) return true;
         if(CheckLeftDiagonal(x,y,checkTurn)) return true;
         return false;
     }
-
-    private bool CheckLine(int x, int y, int checkTurn){
+    
+    //以下、i < NUM_WIN+1の+1は、if(count >= NUM_WIN)の判定を1回余分に行うため
+    private bool CheckHorizontal(int x, int y, int checkTurn){
         int count = 0;
-        for(int i = -NUM_WIN+1;i < NUM_WIN;i++){
+        for(int i = -NUM_WIN+1;i < NUM_WIN+1;i++){
+            if(count >= NUM_WIN) return true;
             if(x+i < 0 || x+i >= BOARD_SIZE) continue;
-            if(mass[y,x+i] == checkTurn) count++;
+            if(mass[y,x+i] == null){
+                count = 0;
+                continue;
+            } 
+            if(mass[y,x+i].ID == checkTurn) count++;
+            else count = 0;
         }
-        if(count >= NUM_WIN) return true;
+        return false;
+    }
+
+    private bool CheckVertical(int x, int y, int checkTurn){
+        int count = 0;
+        for(int i = -NUM_WIN+1;i < NUM_WIN+1;i++){
+            if(count >= NUM_WIN) return true;
+            if(y+i < 0 || y+i >= BOARD_SIZE) continue;
+            if(mass[y+i,x] == null){
+                count = 0;
+                continue;
+            }
+            if(mass[y+i,x].ID == checkTurn) count++;
+            else count = 0;
+        }
         return false;
     }
 
     private bool CheckRightDiagonal(int x, int y, int checkTurn){
         int count = 0;
-        for(int i = -NUM_WIN+1;i < NUM_WIN;i++){
-            if(x+i < 0 || x+i >= NUM_WIN) continue;
-            if(y+i < 0 || y+i >= NUM_WIN) continue;
-            if(mass[y+i,x+i] == checkTurn) count++;
+        for(int i = -NUM_WIN+1;i < NUM_WIN+1;i++){
+            if(count >= NUM_WIN) return true;
+            if(x+i < 0 || x+i >= BOARD_SIZE) continue;
+            if(y+i < 0 || y+i >= BOARD_SIZE) continue;
+            if(mass[y+i,x+i] == null){
+                count = 0;
+                continue;
+            }
+            if(mass[y+i,x+i].ID == checkTurn) count++;
+            else count = 0;
         }
-        if(count >= NUM_WIN) return true;
         return false;
     }
 
     private bool CheckLeftDiagonal(int x, int y, int checkTurn){
         int count = 0;
-        for(int i = -NUM_WIN+1;i < NUM_WIN;i++){
-            if(x+i < 0 || x+i >= NUM_WIN) continue;
-            if(y+i < 0 || y-i >= NUM_WIN) continue;
-            if(mass[y-i,x+i] == checkTurn) count++;
+        for(int i = -NUM_WIN+1;i < NUM_WIN+1;i++){
+            if(count >= NUM_WIN) return true;
+            if(x+i < 0 || x+i >= BOARD_SIZE) continue;
+            if(y-i < 0 || y-i >= BOARD_SIZE) continue;
+            if(mass[y-i,x+i] == null){
+                count = 0;
+                continue;
+            }
+            if(mass[y-i,x+i].ID == checkTurn) count++;
+            else count = 0;
         }
-        if(count >= NUM_WIN) return true;
         return false;
     }
 
     public void OnPut(Vector2 clickPos){
-        string prefab = (GameManager.Turn==0)?redstar.name:bluestar.name;
-        PhotonNetwork.Instantiate(prefab,clickPos,Quaternion.identity);
-        mass[(int)clickPos.y,(int)clickPos.x] = GameManager.Turn;
-    }
-
-    public void OnRemove(GameObject hitObj, Vector2 clickPos){
-        PhotonView hitView = hitObj.GetComponent<PhotonView>();
-        if(hitView.IsMine){
-            PhotonNetwork.Destroy(hitObj);
-        }else{
-            hitView.RequestOwnership();
+        GameObject star = PhotonNetwork.Instantiate($"{GameManager.Turn}_star",clickPos,Quaternion.identity);
+        mass[(int)clickPos.y,(int)clickPos.x] = star.GetComponent<Star>();
+        if(Check(clickPos)){
+            gameManager.GameEndCaller();
         }
-        mass[(int)clickPos.y,(int)clickPos.x] = -1;
     }
 
-    public void OnBurst(){
+    public void OnRemove(GameObject hitObj){
+        Star hitStar = hitObj.GetComponent<Star>();
+        hitStar.DestroyMe();
+    }
 
+    public void OnBurst(Vector2 clickPos){
+        burstObj = Instantiate(burst,clickPos,Quaternion.identity);
+        Invoke("BurstEnd",0.05f);
+    }
+
+    private void BurstEnd(){
+        Destroy(burstObj);
     }
 }

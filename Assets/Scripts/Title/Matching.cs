@@ -29,9 +29,14 @@ public class Matching : MonoBehaviourPunCallbacks{
         SceneManager.LoadSceneAsync("Main");
     }
 
-    public void Connect(){
+    public void ConnectOnline(){
         PhotonNetwork.NickName = "Player";
         PhotonNetwork.ConnectUsingSettings();
+    }
+
+    public void ConnectLocal(){
+        PhotonNetwork.OfflineMode = true;
+        MatchFound();
     }
 
     public void Cancel(){

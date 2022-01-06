@@ -12,8 +12,9 @@ GameObject:
   - component: {fileID: 3298064984061290836}
   - component: {fileID: 2457312816537965868}
   - component: {fileID: -8075462652354026235}
+  - component: {fileID: -8478932551351715935}
   m_Layer: 0
-  m_Name: redstar
+  m_Name: 0_star
   m_TagString: Star
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -132,3 +133,15 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 10, y: 10}
   m_EdgeRadius: 0
+--- !u!114 &-8478932551351715935
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7343349588552383792}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c550ded843af63488e9b9c362a3a902, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

@@ -34,12 +34,12 @@ MonoBehaviour:
   RunInBackground: 1
   StartInOfflineMode: 0
   RpcList:
+  - TurnChange
   - ClickRpc
   - DestroyRpc
-  - DestroySpaceship
-  - Fire
-  - RespawnSpaceship
-  - TurnChange
+  - GameEnd
+  - DeleteStar
+  - PutStar
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 0

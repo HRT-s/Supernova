@@ -15,7 +15,6 @@ public class GamePlayer : MonoBehaviourPunCallbacks{
     private const int MAX_ACTIONTIME = 2;
     private int myTurn;
     private int actionTime;
-    private string playerKind;
     private RaycastHit2D hit;
     private Vector2 clickedPos;
     private GameObject hitObj;
@@ -24,12 +23,12 @@ public class GamePlayer : MonoBehaviourPunCallbacks{
     private void Start(){
         myTurn = PhotonNetwork.LocalPlayer.ActorNumber-1;
         actionTime = MAX_ACTIONTIME;
-        playerKind = (IsMyTurn())?"あなた":"相手";
-        turnText.text = $"Player{GameManager.Turn}({playerKind})のターン";
+        TurnTextChange();
         InitButton();
     }
 
     private void Update() {
+        if(GameManager.IsFinish) return;
         if(actionTime == 0){
             photonView.RPC("TurnChange",RpcTarget.All);
             actionTime = MAX_ACTIONTIME;
@@ -49,11 +48,21 @@ public class GamePlayer : MonoBehaviourPunCallbacks{
         return myTurn==GameManager.Turn;
     }
 
+    private void TurnTextChange(){
+        string playerKind;
+        if(PhotonNetwork.OfflineMode){
+            playerKind = (myTurn==0)?"先手":"後手";
+        }else{
+            playerKind = (IsMyTurn())?"あなた":"相手";
+        }
+        turnText.text = $"Player{GameManager.Turn}({playerKind})のターン";
+    }
+
     [PunRPC]
     private void TurnChange(){
         GameManager.Turn = (GameManager.Turn+1) % 2;
-        playerKind = (GameManager.Turn==myTurn)?"あなた":"相手";
-        turnText.text = $"Player{GameManager.Turn}({playerKind})のターン";
+        if(PhotonNetwork.OfflineMode) myTurn = GameManager.Turn;
+        TurnTextChange();
     }
     
     private void MouseClicked(){
@@ -71,7 +80,7 @@ public class GamePlayer : MonoBehaviourPunCallbacks{
             if(hit){
                 hitObj = hit.transform.gameObject;
                 rmButton.interactable = true;
-                if(hitObj.GetPhotonView().IsMine){
+                if(hitObj.GetComponent<Star>().ID == myTurn){
                     burstButton.interactable = true;
                 }
             }else{
@@ -83,7 +92,6 @@ public class GamePlayer : MonoBehaviourPunCallbacks{
     private void ButtonClicked(){
         InitButton();
         Destroy(targetObj);
-        //targetObj = null;
         actionTime--;
     }
 
@@ -94,11 +102,11 @@ public class GamePlayer : MonoBehaviourPunCallbacks{
 
     public void OnRmAction(){
         ButtonClicked();
-        board.OnRemove(hitObj,clickedPos);
+        board.OnRemove(hitObj);
     }
 
     public void OnBurstAction(){
         ButtonClicked();
-        board.OnBurst();
+        board.OnBurst(clickedPos);
     }
 }
