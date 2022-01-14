@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using Photon.Pun;
 using Photon.Realtime;
+using UnityEngine.UI;
 
 public class Matching : MonoBehaviourPunCallbacks{
     [SerializeField] private GameObject selectCanvas;
@@ -21,6 +22,7 @@ public class Matching : MonoBehaviourPunCallbacks{
         if(isConnected && PhotonNetwork.CurrentRoom.PlayerCount == PhotonNetwork.CurrentRoom.MaxPlayers){
             PhotonNetwork.CurrentRoom.IsOpen = false;
             textAnim.IsMatching = true;
+            matchCanvas.GetComponentInChildren<Button>().interactable = false;
             Invoke("MatchFound",2.0f);
         }
     }

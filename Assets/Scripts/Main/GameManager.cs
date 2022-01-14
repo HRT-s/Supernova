@@ -10,6 +10,7 @@ using TMPro;
 public class GameManager : MonoBehaviourPunCallbacks{
     [SerializeField] private GameObject errorPanel;
     [SerializeField] private GameObject endPanel;
+    [SerializeField] private GameObject explosionPanel;
     [SerializeField] private Color winnerColor;
     [SerializeField] private Color loserColor;
     private static bool isFinish;
@@ -21,6 +22,7 @@ public class GameManager : MonoBehaviourPunCallbacks{
     private void Start(){
         errorPanel.SetActive(false);
         endPanel.SetActive(false);
+        explosionPanel.SetActive(false);
         turn = 0;
         isFinish = false;
         isConnect = true;
@@ -34,11 +36,17 @@ public class GameManager : MonoBehaviourPunCallbacks{
     }
 
     public void GameEndCaller(){
-        photonView.RPC("GameEnd",RpcTarget.All);
+        photonView.RPC("SupernovaExplosion",RpcTarget.All);
     }
 
     [PunRPC]
+    private void SupernovaExplosion(){
+        explosionPanel.SetActive(true);
+        Invoke("GameEnd",3.0f);
+    }
+
     private void GameEnd(){
+        explosionPanel.SetActive(false);
         endPanel.SetActive(true);
         TextMeshProUGUI tmpro = endPanel.GetComponentInChildren<TextMeshProUGUI>();
         if(PhotonNetwork.OfflineMode){

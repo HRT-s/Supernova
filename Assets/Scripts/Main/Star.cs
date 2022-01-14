@@ -12,6 +12,10 @@ public class Star : MonoBehaviourPunCallbacks{
         id = int.Parse(Regex.Replace(this.name,@"[^0-9]",""));
     }
 
+    public void Shining(){
+        PhotonNetwork.Instantiate("shining",this.transform.position,Quaternion.identity);
+    }
+
     public void DestroyMe(){
         if(photonView.IsMine){
             PhotonNetwork.Destroy(this.gameObject);
