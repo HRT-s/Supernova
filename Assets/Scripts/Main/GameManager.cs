@@ -41,6 +41,7 @@ public class GameManager : MonoBehaviourPunCallbacks{
 
     [PunRPC]
     private void SupernovaExplosion(){
+        isFinish = true;
         explosionPanel.SetActive(true);
         Invoke("GameEnd",3.0f);
     }
@@ -64,7 +65,6 @@ public class GameManager : MonoBehaviourPunCallbacks{
                 tmpro.color = loserColor;
             }
         }
-        isFinish = true;
     }
 
     public void OnEnterButtonClicked(){

@@ -102,10 +102,6 @@ public class Board : MonoBehaviourPunCallbacks{
         return false;
     }
 
-    private void CallGameEnd(){
-        gameManager.GameEndCaller();
-    }
-
     public void OnPut(Vector2 clickPos){
         GameObject star = PhotonNetwork.Instantiate($"{GameManager.Turn}_star",clickPos,Quaternion.identity);
         mass[(int)clickPos.y,(int)clickPos.x] = star.GetComponent<Star>();
@@ -113,7 +109,7 @@ public class Board : MonoBehaviourPunCallbacks{
             for(int i = 0;i < NUM_WIN;i++){
                 checkedStars[i].Shining();
             }
-            Invoke("CallGameEnd",1.0f);
+            gameManager.GameEndCaller();
         }
     }
 

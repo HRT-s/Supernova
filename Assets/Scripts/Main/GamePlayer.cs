@@ -19,12 +19,15 @@ public class GamePlayer : MonoBehaviourPunCallbacks{
     private Vector2 clickedPos;
     private GameObject hitObj;
     private GameObject targetObj;
+    private int rmCT,burstCT;
 
     private void Start(){
         myTurn = PhotonNetwork.LocalPlayer.ActorNumber-1;
         actionTime = MAX_ACTIONTIME;
         TurnTextChange();
         InitButton();
+        rmCT = 0;
+        burstCT = 0;
     }
 
     private void Update() {
@@ -32,6 +35,8 @@ public class GamePlayer : MonoBehaviourPunCallbacks{
         if(actionTime == 0){
             photonView.RPC("TurnChange",RpcTarget.All);
             actionTime = MAX_ACTIONTIME;
+            rmCT--;
+            burstCT--;
         }
         if(IsMyTurn() && Input.GetMouseButtonDown(0)){
             MouseClicked();
@@ -79,9 +84,13 @@ public class GamePlayer : MonoBehaviourPunCallbacks{
             targetObj = Instantiate(targetPref,clickPos2D,Quaternion.identity);
             if(hit){
                 hitObj = hit.transform.gameObject;
-                rmButton.interactable = true;
+                if(rmCT <= 0){
+                    rmButton.interactable = true;
+                }
                 if(hitObj.GetComponent<Star>().ID == myTurn){
-                    burstButton.interactable = true;
+                    if(burstCT <= 0){
+                        burstButton.interactable = true;
+                    }
                 }
             }else{
                 putButton.interactable = true;
@@ -103,10 +112,12 @@ public class GamePlayer : MonoBehaviourPunCallbacks{
     public void OnRmAction(){
         ButtonClicked();
         board.OnRemove(hitObj);
+        rmCT = 3 - myTurn;
     }
 
     public void OnBurstAction(){
         ButtonClicked();
         board.OnBurst(clickedPos);
+        burstCT = 3 - myTurn;
     }
 }
