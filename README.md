@@ -7,6 +7,10 @@
 
 オンライン対戦とローカル対戦が可能
 
+## 使用言語・ツール等
+![C#](https://img.shields.io/badge/c%23%20-%23239120.svg?&style=for-the-badge&logo=c-sharp&logoColor=white)
+![Unity](https://img.shields.io/badge/unity%20-%23000000.svg?&style=for-the-badge&logo=unity&logoColor=white)
+
 ## ルール
 プレイヤーは1ターン中に2回行動をすることができる。
 - 星の設置...盤面に星を置く
